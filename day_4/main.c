@@ -21,6 +21,15 @@ takeInput(int argc, u8** argv, u8** input, int* inputSize)
 }
 
 
+u8
+wordSearch(smol* map, int width, int height, int i, int mult, int add)
+{
+	u8 a = 1;
+	for(int j = 1; j < 4; j++) if(map[i+j*mult+add]) a = 0;
+	return a;
+}
+
+
 void
 part1(u8* input, int inputSize)
 {
@@ -31,73 +40,36 @@ part1(u8* input, int inputSize)
 	while(input[width] != '\r') width++;
 	height = inputSize/(height+2);
 	
-	smol map[width*height] = {0};
+	smol* map = calloc(width*height, 1);
 	int c1 = 0;
 	int c2 = 0;
 	while(c1 < inputSize)
 	{
-		map[c2] = input[c1]-'1';
+		map[c2] = input[c1]-'0';
 		c1++;
 		c2++;
 		if(input[c1] == '\r') c1 += 2;
 	}
 	
-	for(int i = 0; i < width*size; i += width)
+	for(int i = 0; i < width*height; i++)
 	{
-		c1 = 0;
-		c2 = 3;
-		for(int j = 0; j < width; j++)
+		if(map[i] == 1)
 		{
-			if(map[i+j] == c1) 
-			{
-				c1++;
-				if(c1 == 4)
-				{
-					total++;
-					c1 = 0;
-				}
-			}
-			if(map[i+j] == c2)
-			{
-				c2--;
-				if(c2 == -1)
-				{
-					total++;
-					c2 = 3;
-				}
-			}
+			int h = i/width;
+			int w = i%width; 
+			if(w > 2)						total += wordSearch(map, width, height, i,	  -1,  0);
+			if(h > 2)						total += wordSearch(map, width, height, i, -width,  0);
+			if(w > width-4)					total += wordSearch(map, width, height, i,	   1,  0);
+			if(w > height-4)				total += wordSearch(map, width, height, i,  width,  0);
+			if(w > 2 && h > 2)				total += wordSearch(map, width, height, i, -width, -1);
+			if(w > 2 && h < height-4)		total += wordSearch(map, width, height, i,  width, -1);
+			if(w < width-4 && h > 2)		total += wordSearch(map, width, height, i, -width,  1);
+			if(w < width-4 && h < height-4) total += wordSearch(map, width, height, i,  width,  1);
 		}
 	}
-
-	for(int i = 0; i < width; i++)
-	{
-		c1 = 0;
-		c2 = 3;
-		for(int j = 0; j < height; j++)
-		{
-			if(map[j*width + i] == c1) 
-			{
-				c1++;
-				if(c1 == 4)
-				{
-					total++;
-					c1 = 0;
-				}
-			}
-			if(map[j*width + i] == c2)
-			{
-				c2--;
-				if(c2 == -1)
-				{
-					total++;
-					c2 = 3;
-				}
-			}
-		}
-	}
-
-	incr = -1;
-	for(int i = 0; i
+	
+	printf("part 1: %llu", total);
+}
 	
 
 int
